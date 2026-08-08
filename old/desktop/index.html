@@ -6,7 +6,51 @@
     opacity: 0.5;
     cursor: not-allowed;
   }
+
+  /* --- 1. REMOVE UNLIGHTOUSE BRANDING --- */
+    /* Use 'starts with' selector to catch the link with or without a trailing slash */
+    nav a[href^="https://unlighthouse.dev"] {
+      display: none !important;
+    }
+
+    /* Hide top-right GitHub icon */
+    nav a[href*="github.com/harlan-zw/unlighthouse"] {
+      display: none !important;
+    }
+
+    /* Hide sidebar footer links (Documentation, Debug, Made by, Lighthouse credits) */
+    .hidden.xl\:block > .px-2.text-center.xl\:text-left {
+      display: none !important;
+    }
+
+    /* Hide mobile footer with identical credits */
+    footer.block.xl\:hidden {
+      display: none !important;
+    }
+
+    /* Hide 'Dynamic sampling' notice and link below the tabs */
+    .text-sm.opacity-70.mt-3 {
+      display: none !important;
+    }
+
+    /* --- 2. ADD BENCHMARK LOGO --- */
+    /* Replace the broken favicon with the official Benchmark logo */
+    .text-muted img {
+      content: url("https://www.benchmarksystems.com/wp-content/themes/accel434/assets/images/logo.png") !important;
+      width: 170px !important;
+      height: auto !important;
+      min-height: auto !important;
+      max-height: none !important;
+      margin-right: 0 !important;
+      transform: translateY(-2px);
+    }
+
+    /* Hide the plain "benchmarksystems.com" text since the new logo includes the name */
+    .text-muted span {
+      display: none !important;
+    }
   </style>
+
 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
