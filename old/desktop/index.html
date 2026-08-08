@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <style>
+  button[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  /* --- 1. REMOVE UNLIGHTHOUSE BRANDING --- */
+    /* Use 'starts with' selector to catch the link with or without a trailing slash */
+    nav a[href^="https://unlighthouse.dev"] {
+      display: none !important;
+    }
+
+    /* Hide top-right GitHub icon */
+    nav a[href*="github.com/harlan-zw/unlighthouse"] {
+      display: none !important;
+    }
+
+    /* Hide sidebar footer links (Documentation, Debug, Made by, Lighthouse credits) */
+    .hidden.xl\:block > .px-2.text-center.xl\:text-left {
+      display: none !important;
+    }
+
+    /* Hide mobile footer with identical credits */
+    footer.block.xl\:hidden {
+      display: none !important;
+    }
+
+    /* Hide 'Dynamic sampling' notice and link below the tabs */
+    .text-sm.opacity-70.mt-3 {
+      display: none !important;
+    }
+
+    /* --- 2. ADD BENCHMARK LOGO --- */
+    /* Replace the broken favicon with the official Benchmark logo */
+    .text-muted img {
+      content: url("https://www.benchmarksystems.com/wp-content/themes/accel434/assets/images/logo.png") !important;
+      width: 170px !important;       
+      height: auto !important; 
+      min-height: auto !important;
+      max-height: none !important;   /* Allows the logo to size naturally */
+      margin-right: 0 !important;
+      transform: translateY(-2px);   
+    }
+
+    /* Hide the plain "benchmarksystems.com" text since the new logo includes the name */
+    .text-muted span {
+      display: none !important;
+    }
+  </style>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml" media="(prefers-color-scheme:no-preference)">
+  <link rel="icon" href="assets/logo-dark.svg" type="image/svg+xml" media="(prefers-color-scheme:dark)">
+  <link rel="icon" href="assets/logo-light.svg" type="image/svg+xml" media="(prefers-color-scheme:light)">
+
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&family=DM+Serif+Display:ital@0;1&display=swap">
+  <title>Benchmark Systems Performance Report</title>
+  <link rel="icon" href="https://www.benchmarksystems.com/wp-content/themes/accel434/assets/images/logo.png" type="image/png">
+  <link rel="apple-touch-icon" href="https://www.benchmarksystems.com/wp-content/themes/accel434/assets/images/logo.png">
+  <style>
+  .unlighthouse-hide, .unlighthouse-logo, .brand-logo, .logo-svg, .site-logo, [class*="unlighthouse"], [class*="Unlighthouse"], [class*="github"], [class*="GitHub"], [class*="logo"] {
+    display: none !important;
+    visibility: hidden !important;
+  }
+  a[href*="github.com"],
+  a[href*="unlighthouse"],
+  a[href*="documentation"],
+  a[href*="payload.html"],
+  a[href*="raw.githubusercontent.com"],
+  a[href$=".json"],
+  a[href$=".js"],
+  a[href$=".pdf"] {
+    pointer-events: none !important;
+    cursor: default !important;
+    opacity: 0.7 !important;
+  }
+  </style>
+  <script>
+  (function() {
+    const setTitle = () => { document.title = 'Benchmark Systems Performance Report' }
+    const iconUrl = 'https://www.benchmarksystems.com/wp-content/themes/accel434/assets/images/logo.png'
+    const addIcon = (rel) => {
+      const link = document.createElement('link')
+      link.rel = rel
+      link.href = iconUrl
+      document.head.appendChild(link)
+    }
+    const hideElements = () => {
+      const selectors = [
+        '[class*="unlighthouse"]',
+        '[class*="Unlighthouse"]',
+        '[class*="github"]',
+        '[class*="GitHub"]',
+        '[class*="logo"]',
+        'a[href*="github.com"]',
+        'a[href*="unlighthouse"]',
+        'a[href*="documentation"]',
+        'a[href*="payload.html"]',
+        'a[href*="raw.githubusercontent.com"]'
+      ]
+      document.querySelectorAll(selectors.join(',')).forEach(el => {
+        if (el instanceof HTMLElement) {
+          el.style.setProperty('display', 'none', 'important')
+          el.style.setProperty('visibility', 'hidden', 'important')
+          el.style.setProperty('pointer-events', 'none', 'important')
+        }
+      })
+      document.querySelectorAll('img').forEach(img => {
+        const src = img.getAttribute('src') || ''
+        if (/github/i.test(src) || /unlighthouse/i.test(src)) img.style.setProperty('display', 'none', 'important')
+      })
+      document.querySelectorAll('a').forEach(a => {
+        const href = a.getAttribute('href') || ''
+        if (/github\.com|unlighthouse|documentation|payload\.html|raw\.githubusercontent\.com/.test(href)) {
+          a.removeAttribute('href')
+          a.style.setProperty('pointer-events', 'none', 'important')
+          a.style.setProperty('cursor', 'default', 'important')
+          a.style.setProperty('opacity', '0.7', 'important')
+        }
+      })
+    }
+    const apply = () => {
+      setTitle()
+      addIcon('icon')
+      addIcon('apple-touch-icon')
+      hideElements()
+    }
+    const observer = new MutationObserver(apply)
+    observer.observe(document.documentElement, { subtree: true, childList: true })
+    if (document.readyState !== 'loading') apply()
+    else document.addEventListener('DOMContentLoaded', apply)
+  })()
+  </script>
+
+  <script data-unlighthouse-inline>
+  window.__unlighthouse_static = false
+  // boilerplate options to run the client by itself
+  </script>
+  <script data-unlighthouse-payload src="assets/payload.js"></script>
+  <style>
+  /* scroll bars courtesy of https://antfu.me/ */
+  :root {
+    --c-bg: #fff;
+    --c-scrollbar: #eee;
+    --c-scrollbar-hover: #bbb
+  }
+
+  html.dark {
+    --c-bg: #050505;
+    --c-scrollbar: #111;
+    --c-scrollbar-hover: #222
+  }
+
+  * {
+    scrollbar-color: var(--c-scrollbar) var(--c-bg)
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px
+  }
+
+  ::-webkit-scrollbar:horizontal {
+    height: 6px
+  }
+
+  ::-webkit-scrollbar-track, ::-webkit-scrollbar-corner {
+    background: var(--c-bg);
+    border-radius: 10px
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--c-scrollbar);
+    border-radius: 10px
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--c-scrollbar-hover)
+  }
+  </style>
+  <script type="module" crossorigin src="assets/index-CGj_ix7-.js"></script>
+  <link rel="stylesheet" crossorigin href="assets/index-BoWfaWMc.css">
+</head>
+<body class="dark:bg-[#020617]">
+<div id="app"></div>
+<script>
+(function () {
+  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+  const setting = localStorage.getItem('color-schema') || 'auto'
+  if (setting === 'dark' || (prefersDark && setting !== 'light'))
+    document.documentElement.classList.toggle('dark', true)
+
+  // document.title = __unlighthouse_data.options.host.replace(/https?:\/\/(www.)?/, '') + ' | Unlighthouse'
+})()
+</script>
+</body>
+</html>
