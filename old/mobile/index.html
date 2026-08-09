@@ -1,124 +1,620 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lighthouse Reports Dashboard</title>
   <style>
-  button[disabled] {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  /* --- 1. REMOVE UNLIGHTOUSE BRANDING --- */
-    /* Use 'starts with' selector to catch the link with or without a trailing slash */
-    nav a[href^="https://unlighthouse.dev"] {
-      display: none !important;
+    :root {
+      --bg-main: #0b0e14;
+      --bg-sidebar: #11151d;
+      --bg-card: #151a23;
+      --bg-card-hover: #1c2230;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --color-red: #ef4444;
+      --color-orange: #f59e0b;
+      --color-green: #10b981;
+      --border-color: #1f2937;
+      --accent-blue: #2563eb;
     }
 
-    /* Hide top-right GitHub icon */
-    nav a[href*="github.com/harlan-zw/unlighthouse"] {
-      display: none !important;
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
 
-    /* Hide sidebar footer links (Documentation, Debug, Made by, Lighthouse credits) */
-    .hidden.xl\:block > .px-2.text-center.xl\:text-left {
-      display: none !important;
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
     }
 
-    /* Hide mobile footer with identical credits */
-    footer.block.xl\:hidden {
-      display: none !important;
+    /* Sidebar */
+    .sidebar {
+      width: 260px;
+      background-color: var(--bg-sidebar);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      padding-top: 15px;
     }
 
-    /* Hide 'Dynamic sampling' notice and link below the tabs */
-    .text-sm.opacity-70.mt-3 {
-      display: none !important;
+    .brand {
+      padding: 0 20px 20px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #fff;
     }
 
-    /* --- 2. ADD BENCHMARK LOGO --- */
-    /* Replace the broken favicon with the official Benchmark logo */
-    .text-muted img {
-      content: url("https://www.benchmarksystems.com/wp-content/themes/accel434/assets/images/logo.png") !important;
-      width: 65px !important;
-      height: auto !important;
-      min-height: auto !important;
-      max-height: none !important;
-      margin-right: 0 !important;
-      transform: translateY(-2px);
+    .brand-icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: conic-gradient(from 0deg, var(--color-green), var(--color-orange), var(--color-red), var(--color-green));
     }
 
-    /* Hide the plain "benchmarksystems.com" text since the new logo includes the name */
-    .text-muted span {
-      display: none !important;
+    .nav-menu {
+      list-style: none;
+      padding: 15px 0;
+    }
+
+    .nav-item {
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .nav-item:hover {
+      background-color: rgba(255, 255, 255, 0.03);
+      color: var(--text-main);
+    }
+
+    .nav-item.active {
+      background-color: var(--accent-blue);
+      color: #fff;
+      border-radius: 0 25px 25px 0;
+      margin-right: 10px;
+    }
+
+    .nav-score {
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+
+    /* Main Area */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .top-bar {
+      height: 60px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 25px;
+      background-color: var(--bg-sidebar);
+    }
+
+    .table-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    .table-header {
+      display: grid;
+      grid-template-columns: 3fr 3fr 2fr 60px;
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 600;
+    }
+
+    /* Rows */
+    .row {
+      display: grid;
+      grid-template-columns: 3fr 3fr 2fr 60px;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-color);
+      align-items: center;
+      transition: background-color 0.15s;
+    }
+
+    .row:nth-child(even) {
+      background-color: var(--bg-card);
+    }
+
+    .row:hover {
+      background-color: var(--bg-card-hover);
+    }
+
+    .page-info {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .thumbnail {
+      width: 55px;
+      height: 75px;
+      background-color: #2a313d;
+      object-fit: cover;
+      border-radius: 4px;
+      border: 1px solid var(--border-color);
+      flex-shrink: 0;
+    }
+
+    .details {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .page-title {
+      color: #93c5fd;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      line-height: 1.3;
+      cursor: pointer;
+    }
+
+    .page-title:hover {
+      text-decoration: underline;
+    }
+
+    .badge-redirect {
+      background-color: #374151;
+      color: #fca5a5;
+      font-size: 0.65rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      width: fit-content;
+      font-weight: 700;
+    }
+
+    .timestamp {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+    }
+
+    .view-report-btn {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 2px;
+    }
+
+    .view-report-btn:hover {
+      color: #fff;
+    }
+
+    /* Score Circles */
+    .scores-container {
+      display: flex;
+      gap: 18px;
+    }
+
+    .score-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .score-label {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+    }
+
+    .circle {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.95rem;
+      border: 3px solid;
+      background-color: var(--bg-main);
+    }
+
+    .circle.red { border-color: var(--color-red); color: var(--color-red); }
+    .circle.orange { border-color: var(--color-orange); color: var(--color-orange); }
+    .circle.green { border-color: var(--color-green); color: var(--color-green); }
+
+    .actions {
+      text-align: right;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 80px 20px;
+      color: var(--text-muted);
+    }
+
+    .empty-state h3 {
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+      color: var(--text-main);
+    }
+
+    /* Modal Overlay */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(0, 0, 0, 0.75);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal-content {
+      width: 92vw;
+      height: 90vh;
+      background-color: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5);
+    }
+
+    .modal-header {
+      background-color: var(--bg-sidebar);
+      color: #fff;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .modal-header h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 80%;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.5rem;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .modal-close:hover {
+      color: #fff;
+    }
+
+    .modal-body {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+    }
+
+    .modal-body iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
     }
   </style>
-
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" href="assets/logo.svg" type="image/svg+xml" media="(prefers-color-scheme:no-preference)">
-  <link rel="icon" href="assets/logo-dark.svg" type="image/svg+xml" media="(prefers-color-scheme:dark)">
-  <link rel="icon" href="assets/logo-light.svg" type="image/svg+xml" media="(prefers-color-scheme:light)">
-
-  <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&family=DM+Serif+Display:ital@0;1&display=swap">
-  <title>Unlighthouse</title>
-  <script data-unlighthouse-inline>
-  window.__unlighthouse_static = false
-  // boilerplate options to run the client by itself
-  </script>
-  <script data-unlighthouse-payload src="assets/payload.js"></script>
-  <style>
-  /* scroll bars courtesy of https://antfu.me/ */
-  :root {
-    --c-bg: #fff;
-    --c-scrollbar: #eee;
-    --c-scrollbar-hover: #bbb
-  }
-
-  html.dark {
-    --c-bg: #050505;
-    --c-scrollbar: #111;
-    --c-scrollbar-hover: #222
-  }
-
-  * {
-    scrollbar-color: var(--c-scrollbar) var(--c-bg)
-  }
-
-  ::-webkit-scrollbar {
-    width: 6px
-  }
-
-  ::-webkit-scrollbar:horizontal {
-    height: 6px
-  }
-
-  ::-webkit-scrollbar-track, ::-webkit-scrollbar-corner {
-    background: var(--c-bg);
-    border-radius: 10px
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: var(--c-scrollbar);
-    border-radius: 10px
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: var(--c-scrollbar-hover)
-  }
-  </style>
-  <script type="module" crossorigin src="assets/index-CGj_ix7-.js"></script>
-  <link rel="stylesheet" crossorigin href="assets/index-BoWfaWMc.css">
 </head>
-<body class="dark:bg-[#020617]">
-<div id="app"></div>
-<script>
-(function () {
-  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
-  const setting = localStorage.getItem('color-schema') || 'auto'
-  if (setting === 'dark' || (prefersDark && setting !== 'light'))
-    document.documentElement.classList.toggle('dark', true)
+<body>
 
-  // document.title = __unlighthouse_data.options.host.replace(/https?:\/\/(www.)?/, '') + ' | Unlighthouse'
-})()
-</script>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="brand">
+      Benchmarksystems.com <br /> <div style="font-size:12px;font-weight:300;
+    display: contents;">Mobile <br /> Before Performance Enhancements </br> Report by - Anand Iyengar</div>
+    </div>
+    <ul class="nav-menu">
+      <li class="nav-item active">
+        <span>Overview</span>
+      </li>
+      <li class="nav-item">
+        <span>Performance</span>
+        <span class="nav-score" id="avg-perf">--</span>
+      </li>
+      <li class="nav-item">
+        <span>Accessibility</span>
+        <span class="nav-score" id="avg-a11y">--</span>
+      </li>
+      <li class="nav-item">
+        <span>Best Practices</span>
+        <span class="nav-score" id="avg-bp">--</span>
+      </li>
+      <li class="nav-item">
+        <span>SEO</span>
+        <span class="nav-score" id="avg-seo">--</span>
+      </li>
+    </ul>
+  </aside>
+
+  <!-- Main Content Area -->
+  <main class="main-content">
+    <div class="top-bar">
+      <span style="font-size: 0.85rem; color: var(--text-muted);" id="status-text">Fetching reports from GitHub...</span>
+    </div>
+
+    <div class="table-container">
+      <div class="table-header">
+        <div>Page</div>
+        <div>Scores</div>
+        <div>Status</div>
+        <div style="text-align: right;">Action</div>
+      </div>
+
+      <div id="report-rows">
+        <div class="empty-state">
+          <h3>Loading...</h3>
+          <p>Fetching reports from GitHub Pages...</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Report Modal -->
+  <div class="modal-overlay" id="reportModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modalTitle">Lighthouse Report</h3>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <iframe id="reportFrame"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  const reportRowsContainer = document.getElementById('report-rows');
+    const statusText = document.getElementById('status-text');
+    const reportModal = document.getElementById('reportModal');
+    const reportFrame = document.getElementById('reportFrame');
+    const modalTitle = document.getElementById('modalTitle');
+
+    let parsedReports = [];
+
+    // Helper: Determine Color Class for Scores
+    function getScoreClass(score) {
+      if (score >= 90) return 'green';
+      if (score >= 50) return 'orange';
+      return 'red';
+    }
+
+    // Helper: Format Date/Time
+    function formatDate(isoString) {
+      if (!isoString) return '';
+      const date = new Date(isoString);
+      return date.toLocaleString('en-US', {
+        month: 'short', day: 'numeric', year: 'numeric',
+        hour: 'numeric', minute: '2-digit', hour12: true
+      });
+    }
+
+    // Fetch and Process Data Automatically
+    async function fetchReports() {
+      parsedReports = [];
+
+      try {
+        // 1. Fetch the auto-generated manifest file
+        const manifestResponse = await fetch('reports-list.json');
+        if (!manifestResponse.ok) {
+          throw new Error("Could not find reports-list.json. Did you run the generator script?");
+        }
+        
+        const REPORT_FOLDERS = await manifestResponse.json();
+
+        // 2. Fetch all reports simultaneously based on the manifest
+        const fetchPromises = REPORT_FOLDERS.map(async (folder) => {
+          try {
+            // Adjust path for the root folder vs subfolders
+            const basePath = folder === '' ? 'reports' : `reports/${folder}`;
+            
+            const response = await fetch(`${basePath}/lighthouse.json`);
+            if (!response.ok) return null;
+
+            const json = await response.json();
+
+            // Calculate category scores (0-100)
+            const categories = json.categories || {};
+            const scores = {
+              performance: Math.round((categories.performance?.score || 0) * 100),
+              accessibility: Math.round((categories.accessibility?.score || 0) * 100),
+              bestPractices: Math.round((categories['best-practices']?.score || 0) * 100),
+              seo: Math.round((categories.seo?.score || 0) * 100)
+            };
+
+            // Generate Thumbnail & HTML URLs
+            let imgSrc = `${basePath}/screenshot.jpeg`; 
+            if (json.audits?.['final-screenshot']?.details?.data) {
+              imgSrc = json.audits['final-screenshot'].details.data;
+            }
+            
+            const htmlUrl = `${basePath}/lighthouse.html`;
+
+            // Format Title & URL cleanly
+            const url = json.finalUrl || json.requestedUrl || (folder === '' ? 'Homepage' : folder);
+            let title = json.lighthouseResult?.requestedUrl;
+            if (!title) {
+               title = folder === '' ? 'Homepage' : folder.split('/').pop().replace(/-/g, ' ');
+            }
+
+            return {
+              folderName: folder,
+              title: title,
+              url: url,
+              fetchTime: json.fetchTime,
+              scores: scores,
+              imgSrc: imgSrc,
+              htmlUrl: htmlUrl,
+              isRedirected: json.finalUrl && json.requestedUrl && json.finalUrl !== json.requestedUrl
+            };
+
+          } catch (error) {
+            console.warn(`Could not fetch report for folder: ${folder}`);
+            return null;
+          }
+        });
+
+        // Wait for all fetches to complete and filter out any failed ones (nulls)
+        const results = await Promise.all(fetchPromises);
+        parsedReports = results.filter(report => report !== null);
+
+        if (parsedReports.length > 0) {
+          statusText.innerHTML = `Successfully loaded <b>${parsedReports.length}</b> reports`;
+          updateSidebarAverages();
+          renderTable();
+        } else {
+          statusText.innerHTML = `<span style="color:var(--color-red)">Failed to load reports</span>`;
+          reportRowsContainer.innerHTML = `
+            <div class="empty-state">
+              <h3>No reports found</h3>
+              <p>The manifest loaded, but the JSON files could not be read.</p>
+            </div>`;
+        }
+      } catch (masterError) {
+        console.error(masterError);
+        statusText.innerHTML = `<span style="color:var(--color-red)">Error loading manifest</span>`;
+        reportRowsContainer.innerHTML = `
+          <div class="empty-state">
+            <h3>Manifest Missing</h3>
+            <p>Could not find <code>reports-list.json</code>. Make sure you run the generator script locally before uploading to GitHub.</p>
+          </div>`;
+      }
+    }
+
+    // Update Sidebar Averages
+    function updateSidebarAverages() {
+      const totals = parsedReports.reduce((acc, item) => {
+        acc.perf += item.scores.performance;
+        acc.a11y += item.scores.accessibility;
+        acc.bp += item.scores.bestPractices;
+        acc.seo += item.scores.seo;
+        return acc;
+      }, { perf: 0, a11y: 0, bp: 0, seo: 0 });
+
+      const len = parsedReports.length;
+      document.getElementById('avg-perf').innerHTML = `<span class="${getScoreClass(Math.round(totals.perf/len))}-text">■ ${Math.round(totals.perf/len)}</span>`;
+      document.getElementById('avg-a11y').innerHTML = `<span class="${getScoreClass(Math.round(totals.a11y/len))}-text">■ ${Math.round(totals.a11y/len)}</span>`;
+      document.getElementById('avg-bp').innerHTML = `<span class="${getScoreClass(Math.round(totals.bp/len))}-text">■ ${Math.round(totals.bp/len)}</span>`;
+      document.getElementById('avg-seo').innerHTML = `<span class="${getScoreClass(Math.round(totals.seo/len))}-text">■ ${Math.round(totals.seo/len)}</span>`;
+    }
+
+    // Render Table Rows
+    function renderTable() {
+      reportRowsContainer.innerHTML = '';
+
+      parsedReports.forEach((item, index) => {
+        const row = document.createElement('div');
+        row.className = 'row';
+
+        row.innerHTML = `
+          <div class="page-info">
+            <img src="${item.imgSrc}" class="thumbnail" alt="Thumb" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1NSIgaGVpZ2h0PSI3NSIgZmlsbD0iIzJhMzEzZCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIvPjwvc3ZnPg=='" />
+            <div class="details">
+              <span class="page-title" onclick="openModal(${index})">${item.title}</span>
+              ${item.isRedirected ? '<span class="badge-redirect">REDIRECTED</span>' : ''}
+              <span class="timestamp">${formatDate(item.fetchTime)}</span>
+              <span class="view-report-btn" onclick="openModal(${index})">📋 View Lighthouse Report</span>
+            </div>
+          </div>
+
+          <div class="scores-container">
+            <div class="score-col">
+              <div class="circle ${getScoreClass(item.scores.performance)}">${item.scores.performance}</div>
+              <span class="score-label">Performance</span>
+            </div>
+            <div class="score-col">
+              <div class="circle ${getScoreClass(item.scores.accessibility)}">${item.scores.accessibility}</div>
+              <span class="score-label">Accessibility</span>
+            </div>
+            <div class="score-col">
+              <div class="circle ${getScoreClass(item.scores.bestPractices)}">${item.scores.bestPractices}</div>
+              <span class="score-label">Best Practices</span>
+            </div>
+            <div class="score-col">
+              <div class="circle ${getScoreClass(item.scores.seo)}">${item.scores.seo}</div>
+              <span class="score-label">SEO</span>
+            </div>
+          </div>
+
+          <div>
+            <span style="font-size:0.8rem; color:var(--text-muted)">Ready</span>
+          </div>
+
+          <div class="actions" onclick="openModal(${index})">
+            ⋮
+          </div>
+        `;
+
+        reportRowsContainer.appendChild(row);
+      });
+    }
+
+    // Modal Control Functions
+    function openModal(index) {
+      const report = parsedReports[index];
+      modalTitle.textContent = `${report.title} - Lighthouse Report`;
+      reportFrame.src = report.htmlUrl;
+      reportModal.classList.add('open');
+    }
+
+    function closeModal() {
+      reportModal.classList.remove('open');
+      reportFrame.src = '';
+    }
+
+    // Close Modal on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeModal();
+    });
+
+    // Run Fetch when document loads
+    window.addEventListener('DOMContentLoaded', fetchReports);
+  </script>
 </body>
 </html>
