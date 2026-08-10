@@ -192,9 +192,7 @@
       </div>
       <h2>REPORTS</h2>
       <p>Benchmark Current Performance Reports | By Anand Iyengar</p>
-      <div class="live-link-container">
-        <a class="btn-live-site" target="_blank" href="https://anandproj1993.github.io/benchmarksystems-report/reports/mainsite/">Live Site PageSpeed Performance Score</a>
-      </div>
+     
     </div>
 
     <!-- Table Section -->
@@ -233,16 +231,17 @@
     }
 
     function getReportFilename(path, strategy) {
-      const repoBase = window.location.hostname.includes('github.io') ? '/benchmarksystems-report/' : '/';
+      // 1. Convert all non-alphanumeric characters (like slashes) to underscores
+      // This exactly matches how your Node script generates the files.
+      let safeName = path.toLowerCase().replace(/[^a-z0-9]/gi, '_');
       
-      if (!path || path === '/' || path === '') {
-        return `${repoBase}reports/mainsite/official-reports/homepage-${strategy}.html`;
+      // 2. Handle the homepage edge case
+      if (safeName === '_' || safeName === '') {
+        safeName = 'homepage';
       }
       
-      let cleanPath = path.replace(/^\/|\/$/g, '');
-      let safeName = cleanPath.toLowerCase().replace(/[^a-z0-9]/gi, '_');
-      
-      return `${repoBase}reports/mainsite/official-reports/_${safeName}-${strategy}.html`;
+      // 3. Output the exact format: official-reports/_about_benchmark_solutions_-desktop.html
+      return `official-reports/${safeName}-${strategy}.html`;
     }
 
     async function loadData() {
