@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Benchmark Systems - Performance Reports</title>
+  <style>
+    :root {
+      --bg-main: #0b0e14;
+      --bg-card: #151a23;
+      --bg-card-hover: #1c2230;
+      --bg-header: #11151d;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --color-green: #10b981;
+      --color-orange: #f59e0b;
+      --color-red: #ef4444;
+      --border-color: #1f2937;
+      --accent-blue: #2563eb;
+      --accent-purple: #7c3aed;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      padding: 50px 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .wrapper {
+      width: 100%;
+      max-width: 1100px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Header & Logo Section - Centered */
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .logo-container {
+      margin-bottom: 20px;
+    }
+
+    .logo-container img {
+      max-height: 52px;
+      object-fit: contain;
+    }
+
+    .header h2 {
+      font-size: 2rem;
+      color: #ffffff;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .header p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-bottom: 16px;
+    }
+
+    .live-link-container {
+      margin-top: 4px;
+    }
+
+    .btn-live-site {
+      display: inline-block;
+      padding: 10px 22px;
+      background-color: var(--accent-blue);
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 0.9rem;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+
+    .btn-live-site:hover {
+      opacity: 0.85;
+    }
+
+    /* Table Container - Centered */
+    .table-container {
+      width: 100%;
+      background-color: var(--bg-card);
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+      overflow: hidden;
+      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.5);
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 2.5fr 1.5fr 1.5fr 2.5fr;
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border-color);
+      align-items: center;
+      text-align: center;
+    }
+
+    .row:last-child { border-bottom: none; }
+
+    .table-header {
+      background-color: var(--bg-header);
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    .row:not(.table-header):hover { background-color: var(--bg-card-hover); }
+
+    .row div:first-child {
+      text-align: left;
+    }
+
+    .page-path { font-weight: 600; color: #93c5fd; font-size: 0.95rem; }
+    .page-url { font-size: 0.75rem; color: var(--text-muted); display: block; margin-top: 3px; }
+
+    .score-badge { display: inline-flex; align-items: center; justify-content: center; }
+    
+    .circle {
+      width: 38px; height: 38px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 0.85rem; border: 2px solid;
+      background-color: var(--bg-main);
+    }
+
+    .circle.green { border-color: var(--color-green); color: var(--color-green); }
+    .circle.orange { border-color: var(--color-orange); color: var(--color-orange); }
+    .circle.red { border-color: var(--color-red); color: var(--color-red); }
+    .circle.null { border-color: var(--text-muted); color: var(--text-muted); }
+
+    .actions { display: flex; gap: 8px; justify-content: center; }
+    
+    .btn {
+      padding: 7px 12px; border-radius: 6px; font-size: 0.75rem;
+      font-weight: 600; cursor: pointer; text-decoration: none;
+      border: none; transition: opacity 0.2s;
+    }
+
+    .btn-desktop { background-color: var(--accent-blue); color: #fff; }
+    .btn-mobile { background-color: var(--accent-purple); color: #fff; }
+    .btn-link { background-color: #374151; color: #fff; }
+    .btn:hover { opacity: 0.85; }
+
+    /* Modal Overlay (Lightbox) */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background-color: rgba(0, 0, 0, 0.85); display: none;
+      justify-content: center; align-items: center; z-index: 9999;
+      backdrop-filter: blur(5px);
+    }
+    .modal-overlay.open { display: flex; }
+    
+    .modal-content {
+      width: 92vw; height: 92vh; background-color: #fff;
+      border-radius: 10px; display: flex; flex-direction: column; overflow: hidden;
+    }
+
+    .modal-header {
+      background-color: #111827; color: #fff; padding: 14px 20px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .modal-close { background: none; border: none; color: var(--text-muted); font-size: 1.6rem; cursor: pointer; }
+    .modal-close:hover { color: #fff; }
+    .modal-body { flex: 1; background-color: #f9fafb; }
+    .modal-body iframe { width: 100%; height: 100%; border: none; }
+  </style>
+</head>
+<body>
+
+  <div class="wrapper">
+    <!-- Header Section -->
+    <div class="header">
+      <div class="logo-container">
+        <img src="https://www.staging2.benchmarksystems.com/wp-content/themes/accel434/assets/images/logo.png" alt="Logo">
+      </div>
+      <h2>REPORTS</h2>
+      <p>Benchmark Staging Performance Reports | By Anand Iyengar</p>
+      
+    </div>
+
+    <!-- Table Section -->
+    <div class="table-container">
+      <div class="row table-header">
+        <div>Page Path</div>
+        <div>Desktop Performance</div>
+        <div>Mobile Performance</div>
+        <div>Pagespeed Reports</div>
+      </div>
+      <div id="pages-list">
+        <div style="padding: 24px; text-align: center; color: var(--text-muted);">Loading staging metrics...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lightbox Modal -->
+  <div class="modal-overlay" id="reportModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div id="modalTitle" style="font-weight: 600;">Lighthouse Report</div>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <iframe id="reportFrame"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function getScoreClass(score) {
+      if (!score && score !== 0) return 'null';
+      if (score >= 90) return 'green';
+      if (score >= 50) return 'orange';
+      return 'red';
+    }
+
+    function getReportFilename(path, strategy) {
+      if (path === '/' || path === '') return `./official-reports/homepage-${strategy}.html`;
+      
+      // Explicit relative path structure for GitHub Pages subfolder resolution
+      let safeName = path.toLowerCase().replace(/[^a-z0-9]/gi, '_');
+      return `./official-reports/${safeName}-${strategy}.html`;
+    }
+
+    async function loadData() {
+      const container = document.getElementById('pages-list');
+      try {
+        const response = await fetch('staging_data.json');
+        const data = await response.json();
+        container.innerHTML = '';
+
+        data.forEach(item => {
+          const path = item['Page Path'] || '/';
+          const fullUrl = item['Full URL'] || `https://staging2.benchmarksystems.com${path}`;
+          const desktopScore = item['Desktop Performance'] ?? '--';
+          const mobileScore = item['Mobile Performance'] ?? '--';
+          const liveUrl = item['Live Google Report Link'];
+
+          const desktopHtml = getReportFilename(path, 'desktop');
+          const mobileHtml = getReportFilename(path, 'mobile');
+
+          const row = document.createElement('div');
+          row.className = 'row';
+          row.innerHTML = `
+            <div>
+              <span class="page-path">${path}</span>
+              <span class="page-url">${fullUrl}</span>
+            </div>
+            <div class="score-badge">
+              <div class="circle ${getScoreClass(desktopScore)}">${desktopScore}</div>
+            </div>
+            <div class="score-badge">
+              <div class="circle ${getScoreClass(mobileScore)}">${mobileScore}</div>
+            </div>
+            <div class="actions">
+              <button class="btn btn-desktop" onclick="openModal('${desktopHtml}', '${path} (Desktop)')">🖥️ Desktop</button>
+              <button class="btn btn-mobile" onclick="openModal('${mobileHtml}', '${path} (Mobile)')">📱 Mobile</button>
+              <a href="${liveUrl}" target="_blank" class="btn btn-link">🔗 Live</a>
+            </div>
+          `;
+          container.appendChild(row);
+        });
+      } catch (err) {
+        container.innerHTML = `<div style="padding: 24px; text-align: center; color: var(--color-red);">Error loading staging_data.json. Make sure your conversion script executed successfully.</div>`;
+      }
+    }
+
+    function openModal(url, title) {
+      document.getElementById('modalTitle').textContent = `Lighthouse Audit: ${title}`;
+      const iframe = document.getElementById('reportFrame');
+      iframe.src = '';
+      setTimeout(() => {
+        iframe.src = url;
+      }, 50);
+      document.getElementById('reportModal').classList.add('open');
+    }
+
+    function closeModal() {
+      document.getElementById('reportModal').classList.remove('open');
+      document.getElementById('reportFrame').src = '';
+    }
+
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+    loadData();
+  </script>
+
+</body>
+</html>
