@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Staging Performance Dashboard</title>
+  <title>Benchmark Systems - Performance Reports</title>
   <style>
     :root {
       --bg-main: #0b0e14;
@@ -12,9 +12,9 @@
       --bg-header: #11151d;
       --text-main: #f3f4f6;
       --text-muted: #9ca3af;
-      --color-red: #ef4444;
-      --color-orange: #f59e0b;
       --color-green: #10b981;
+      --color-orange: #f59e0b;
+      --color-red: #ef4444;
       --border-color: #1f2937;
       --accent-blue: #2563eb;
       --accent-purple: #7c3aed;
@@ -26,34 +26,89 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background-color: var(--bg-main);
       color: var(--text-main);
-      padding: 30px;
+      padding: 50px 20px;
+      display: flex;
+      justify-content: center;
     }
 
-    .container { max-width: 1250px; margin: 0 auto; }
+    .wrapper {
+      width: 100%;
+      max-width: 1100px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
 
+    /* Header & Logo Section - Centered */
     .header {
-      margin-bottom: 25px;
-      padding-bottom: 15px;
-      border-bottom: 1px solid var(--border-color);
+      text-align: center;
+      margin-bottom: 40px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
-    .header h1 { font-size: 1.75rem; color: #fff; }
-    .header p { color: var(--text-muted); font-size: 0.9rem; margin-top: 4px; }
+    .logo-container {
+      margin-bottom: 20px;
+    }
 
+    .logo-container img {
+      max-height: 52px;
+      object-fit: contain;
+    }
+
+    .header h2 {
+      font-size: 2rem;
+      color: #ffffff;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .header p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-bottom: 16px;
+    }
+
+    .live-link-container {
+      margin-top: 4px;
+    }
+
+    .btn-live-site {
+      display: inline-block;
+      padding: 10px 22px;
+      background-color: var(--accent-blue);
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 0.9rem;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+
+    .btn-live-site:hover {
+      opacity: 0.85;
+    }
+
+    /* Table Container - Centered */
     .table-container {
+      width: 100%;
       background-color: var(--bg-card);
-      border-radius: 8px;
+      border-radius: 10px;
       border: 1px solid var(--border-color);
       overflow: hidden;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.5);
     }
 
     .row {
       display: grid;
-      grid-template-columns: 2.5fr 1.5fr 1.5fr 3fr;
-      padding: 14px 20px;
+      grid-template-columns: 2.5fr 1.5fr 1.5fr 2.5fr;
+      padding: 16px 24px;
       border-bottom: 1px solid var(--border-color);
       align-items: center;
+      text-align: center;
     }
 
     .row:last-child { border-bottom: none; }
@@ -69,13 +124,17 @@
 
     .row:not(.table-header):hover { background-color: var(--bg-card-hover); }
 
-    .page-path { font-weight: 600; color: #93c5fd; font-size: 0.95rem; }
-    .page-url { font-size: 0.75rem; color: var(--text-muted); display: block; margin-top: 2px; }
+    .row div:first-child {
+      text-align: left;
+    }
 
-    .score-badge { display: flex; align-items: center; gap: 8px; }
+    .page-path { font-weight: 600; color: #93c5fd; font-size: 0.95rem; }
+    .page-url { font-size: 0.75rem; color: var(--text-muted); display: block; margin-top: 3px; }
+
+    .score-badge { display: inline-flex; align-items: center; justify-content: center; }
     
     .circle {
-      width: 36px; height: 36px; border-radius: 50%;
+      width: 38px; height: 38px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
       font-weight: 700; font-size: 0.85rem; border: 2px solid;
       background-color: var(--bg-main);
@@ -86,20 +145,20 @@
     .circle.red { border-color: var(--color-red); color: var(--color-red); }
     .circle.null { border-color: var(--text-muted); color: var(--text-muted); }
 
-    .actions { display: flex; gap: 8px; justify-content: flex-end; }
+    .actions { display: flex; gap: 8px; justify-content: center; }
     
     .btn {
-      padding: 7px 10px; border-radius: 6px; font-size: 0.75rem;
+      padding: 7px 12px; border-radius: 6px; font-size: 0.75rem;
       font-weight: 600; cursor: pointer; text-decoration: none;
       border: none; transition: opacity 0.2s;
     }
 
     .btn-desktop { background-color: var(--accent-blue); color: #fff; }
     .btn-mobile { background-color: var(--accent-purple); color: #fff; }
-    .btn-live { background-color: #374151; color: #fff; }
+    .btn-link { background-color: #374151; color: #fff; }
     .btn:hover { opacity: 0.85; }
 
-    /* Modal Overlay */
+    /* Modal Overlay (Lightbox) */
     .modal-overlay {
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
       background-color: rgba(0, 0, 0, 0.85); display: none;
@@ -125,19 +184,26 @@
 </head>
 <body>
 
-  <div class="container">
+  <div class="wrapper">
+    <!-- Header Section -->
     <div class="header">
-      <img src="https://www.staging2.benchmarksystems.com/wp-content/themes/accel434/assets/images/logo.png" width="150px" />
-      <h1>Benchmark Current Performance Reports</h1>
-      <p>Live site score report by - Anand Iyengar</p>
+      <div class="logo-container">
+        <img src="https://www.staging2.benchmarksystems.com/wp-content/themes/accel434/assets/images/logo.png" alt="Logo">
+      </div>
+      <h2>REPORTS</h2>
+      <p>Benchmark Current Performance Reports | By Anand Iyengar</p>
+      <div class="live-link-container">
+        <a class="btn-live-site" target="_blank" href="https://anandproj1993.github.io/benchmarksystems-report/reports/mainsite/">Live Site PageSpeed Performance Score</a>
+      </div>
     </div>
 
+    <!-- Table Section -->
     <div class="table-container">
       <div class="row table-header">
         <div>Page Path</div>
         <div>Desktop Performance</div>
         <div>Mobile Performance</div>
-        <div style="text-align: right;">PageSpeed Reports</div>
+        <div>Frozen HTML Reports</div>
       </div>
       <div id="pages-list">
         <div style="padding: 24px; text-align: center; color: var(--text-muted);">Loading staging metrics...</div>
@@ -145,7 +211,7 @@
     </div>
   </div>
 
-  <!-- Modal -->
+  <!-- Lightbox Modal -->
   <div class="modal-overlay" id="reportModal">
     <div class="modal-content">
       <div class="modal-header">
@@ -167,9 +233,11 @@
     }
 
     function getReportFilename(path, strategy) {
-      let safeName = path.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-      if (safeName === '_' || safeName === '') safeName = 'homepage';
-      return `official-reports/${safeName}-${strategy}.html`;
+      if (path === '/' || path === '') return `official-reports/homepage-${strategy}.html`;
+      
+      // Clean path matching how Node script saves files (replaces slashes and special chars with underscores)
+      let safeName = path.replace(/^\/|\/$/g, '').replace(/[^a-z0-9]/gi, '_').toLowerCase();
+      return `official-reports/_${safeName}-${strategy}.html`;
     }
 
     async function loadData() {
@@ -205,7 +273,7 @@
             <div class="actions">
               <button class="btn btn-desktop" onclick="openModal('${desktopHtml}', '${path} (Desktop)')">🖥️ Desktop</button>
               <button class="btn btn-mobile" onclick="openModal('${mobileHtml}', '${path} (Mobile)')">📱 Mobile</button>
-              <a href="${liveUrl}" target="_blank" class="btn btn-live">🔗 Live</a>
+              <a href="${liveUrl}" target="_blank" class="btn btn-link">🔗 Live</a>
             </div>
           `;
           container.appendChild(row);
