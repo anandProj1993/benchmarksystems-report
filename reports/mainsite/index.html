@@ -192,9 +192,7 @@
       </div>
       <h2>REPORTS</h2>
       <p>Benchmark Current Performance Reports | By Anand Iyengar</p>
-      <div class="live-link-container">
-        <a class="btn-live-site" target="_blank" href="https://anandproj1993.github.io/benchmarksystems-report/reports/mainsite/">Live Site PageSpeed Performance Score</a>
-      </div>
+     
     </div>
 
     <!-- Table Section -->
@@ -233,11 +231,15 @@
     }
 
     function getReportFilename(path, strategy) {
-      if (path === '/' || path === '') return `./official-reports/homepage-${strategy}.html`;
+      // Handles absolute base path resolution for GitHub Pages repository structure
+      const repoBase = window.location.hostname.includes('github.io') ? '/benchmarksystems-report/' : '/';
       
-      // Explicit relative path structure for GitHub Pages subfolder resolution
+      if (path === '/' || path === '') {
+        return `${repoBase}official-reports/homepage-${strategy}.html`;
+      }
+      
       let safeName = path.toLowerCase().replace(/[^a-z0-9]/gi, '_');
-      return `./official-reports/${safeName}-${strategy}.html`;
+      return `${repoBase}official-reports/${safeName}-${strategy}.html`;
     }
 
     async function loadData() {
@@ -285,11 +287,7 @@
 
     function openModal(url, title) {
       document.getElementById('modalTitle').textContent = `Lighthouse Audit: ${title}`;
-      const iframe = document.getElementById('reportFrame');
-      iframe.src = '';
-      setTimeout(() => {
-        iframe.src = url;
-      }, 50);
+      document.getElementById('reportFrame').src = url;
       document.getElementById('reportModal').classList.add('open');
     }
 
